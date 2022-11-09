@@ -1,4 +1,4 @@
-package multicall_go
+package multicall2
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/tidwall/gjson"
 	"testing"
 )
 
@@ -36,7 +37,7 @@ func TestExampleViwCallBytes(t *testing.T) {
 	eth, err := getETHClient("https://mainnet.infura.io/v3/17ed7fe26d014e5b9be7dfff5368c69d")
 	decode, _ := hexutil.Decode("0x4903b0d10000000000000000000000000000000000000000000000000000000000000001")
 	vc := NewViewCallBytes(
-		"key.1",
+		"balance",
 		"0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
 		[]string{"uint256"},
 		decode,
@@ -51,6 +52,8 @@ func TestExampleViwCallBytes(t *testing.T) {
 	}
 
 	resJson, _ := json.Marshal(res)
+	println("aaaaa", gjson.Get(string(resJson), "Calls.balance.Decoded.0").String())
+
 	fmt.Println(string(resJson))
 	fmt.Println(res)
 	fmt.Println(err)

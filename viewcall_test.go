@@ -1,4 +1,4 @@
-package multicall_go
+package multicall2
 
 import (
 	"github.com/stretchr/testify/assert"

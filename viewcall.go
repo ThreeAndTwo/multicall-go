@@ -1,4 +1,4 @@
-package multicall_go
+package multicall2
 
 import (
 	"encoding/hex"

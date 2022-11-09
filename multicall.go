@@ -1,4 +1,4 @@
-package multicall_go
+package multicall2
 
 import (
 	"context"
@@ -64,7 +64,6 @@ func (mc multicall) Call(calls ViewCalls, block *big.Int) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	println("resultRaw:", resultRaw)
 	return calls.decode(resultRaw)
 }
 
