@@ -1,4 +1,4 @@
-module github.com/threeandtwo/multicall-go
+module github.com/ThreeAndTwo/multicall-go
 
 go 1.17
 
