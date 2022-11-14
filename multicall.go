@@ -73,7 +73,11 @@ func (mc multicall) CallBytes(callsBytes ViewCallsBytes, block *big.Int) (*Resul
 		return nil, err
 	}
 
-	input, _ := hexutil.Decode(AggregateMethod + hex.EncodeToString(payloadArgs))
+	input, err := hexutil.Decode(AggregateMethod + hex.EncodeToString(payloadArgs))
+	if err != nil {
+		return nil, err
+	}
+
 	msg := ethereum.CallMsg{
 		To:   mc.config.MulticallAddress,
 		Gas:  mc.config.Gas,
