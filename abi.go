@@ -1,6 +1,7 @@
 package multicall2
 
 import (
+	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"math/big"
 	"reflect"
@@ -56,14 +57,13 @@ func recursionOutput(originIndex string, val interface{}, dataMap map[string]int
 			dataMap[mapKey] = vv.Field(i).Interface().(string)
 			//fmt.Println(vv.Field(i).Interface().(string))
 		case reflect.Ptr:
-			dataMap[mapKey] = vv.Field(i).Interface().(*big.Int)
+			dataMap[mapKey] = vv.Field(i).Interface().(*big.Int).String()
 			//fmt.Println(vv.Field(i).Interface().(*big.Int))
 		case reflect.Bool:
 			dataMap[mapKey] = vv.Field(i).Interface().(bool)
 			//fmt.Println(vv.Field(i).Interface().(bool))
 		case reflect.Uint8:
-			dataMap[mapKey] = vv.Field(i).Interface().(uint8)
-			//fmt.Println(vv.Field(i).Interface().(uint8))
+			dataMap[mapKey] = fmt.Sprintf("%d", vv.Field(i).Interface().(uint8))
 		case reflect.Struct:
 			recursionOutput(originIndex+"."+strconv.Itoa(i), vv.Field(i).Interface(), dataMap)
 		}
