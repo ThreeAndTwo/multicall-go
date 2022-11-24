@@ -99,7 +99,7 @@ func TestExampleViewCallBytes(t *testing.T) {
 	println(string(resJson))
 	//println("aaaaa", gjson.Get(string(resJson), "Calls.balance.Decoded.1").String())
 
-	fmt.Println(res)
+	//fmt.Println(res)
 	//fmt.Println(err)
 }
 

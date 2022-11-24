@@ -1,7 +1,6 @@
 package multicall2
 
 import (
-	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"math/big"
 	"reflect"
@@ -41,7 +40,7 @@ func parseData(data []interface{}) map[string]interface{} {
 			dataMap[strconv.Itoa(k)] = v
 			continue
 		}
-		recursionOutput("0", v, dataMap)
+		recursionOutput(strconv.Itoa(k), v, dataMap)
 	}
 	return dataMap
 }
@@ -55,13 +54,16 @@ func recursionOutput(originIndex string, val interface{}, dataMap map[string]int
 		switch vv.Field(i).Type().Kind() {
 		case reflect.String:
 			dataMap[mapKey] = vv.Field(i).Interface().(string)
-			fmt.Println(vv.Field(i).Interface().(string))
+			//fmt.Println(vv.Field(i).Interface().(string))
 		case reflect.Ptr:
 			dataMap[mapKey] = vv.Field(i).Interface().(*big.Int)
-			fmt.Println(vv.Field(i).Interface().(*big.Int))
+			//fmt.Println(vv.Field(i).Interface().(*big.Int))
 		case reflect.Bool:
 			dataMap[mapKey] = vv.Field(i).Interface().(bool)
-			fmt.Println(vv.Field(i).Interface().(bool))
+			//fmt.Println(vv.Field(i).Interface().(bool))
+		case reflect.Uint8:
+			dataMap[mapKey] = vv.Field(i).Interface().(uint8)
+			//fmt.Println(vv.Field(i).Interface().(uint8))
 		case reflect.Struct:
 			recursionOutput(originIndex+"."+strconv.Itoa(i), vv.Field(i).Interface(), dataMap)
 		}
