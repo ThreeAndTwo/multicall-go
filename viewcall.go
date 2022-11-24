@@ -20,10 +20,10 @@ type ViewCall struct {
 }
 
 type ViewCallBytes struct {
-	id        string
-	target    string
-	outputTy  []string
-	inputData []byte
+	id, abi        string
+	method, target string
+	outputTy       []string
+	inputData      []byte
 }
 
 type ViewCallsBytes []ViewCallBytes
@@ -39,11 +39,12 @@ func NewViewCall(id, target, method string, arguments []interface{}) ViewCall {
 	}
 }
 
-func NewViewCallBytes(id, target string, outputTy []string, inputData []byte) ViewCallBytes {
+func NewViewCallBytes(id, abi, method, target string, inputData []byte) ViewCallBytes {
 	return ViewCallBytes{
 		id:        id,
+		abi:       abi,
+		method:    method,
 		target:    target,
-		outputTy:  outputTy,
 		inputData: inputData,
 	}
 }
@@ -56,7 +57,6 @@ func (call ViewCall) Validate() error {
 }
 
 func (cb ViewCallBytes) Validate() error {
-	// TODO
 	return nil
 }
 
@@ -344,21 +344,22 @@ func (calls ViewCalls) decodeRaw(raw string) (*Result, error) {
 	return result, nil
 }
 
-func (cbs ViewCallsBytes) decode(raw string) (*Result, error) {
+func (cbs ViewCallsBytes) decode(raw string) (*BytesResult, error) {
 	decoded, err := decodeWrapper(raw)
 	if err != nil {
 		return nil, err
 	}
-	result := &Result{}
+	result := &BytesResult{}
 	result.BlockNumber = decoded.BlockNumber.Uint64()
-	result.Calls = make(map[string]CallResult)
+	calls := make(map[string]CallBytesResult)
+	result.Calls = calls
 	for index, cb := range cbs {
-		callResult := CallResult{
+		callResult := CallBytesResult{
 			Success: decoded.Returns[index].Success,
 			Raw:     decoded.Returns[index].Data,
 		}
 		if decoded.Returns[index].Success {
-			returnValues, err := cb.decode(decoded.Returns[index].Data)
+			returnValues, err := cb.decodeRaw(decoded.Returns[index].Data)
 			if err != nil {
 				return nil, err
 			}
@@ -367,6 +368,19 @@ func (cbs ViewCallsBytes) decode(raw string) (*Result, error) {
 		result.Calls[cb.id] = callResult
 	}
 	return result, nil
+}
+
+func (cb ViewCallBytes) decodeRaw(raw []byte) (map[string]interface{}, error) {
+	_abi, err := InitABI(cb.abi, cb.method)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := _abi.ParseOutputData(raw)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 func (cb ViewCallBytes) decode(raw []byte) ([]interface{}, error) {
@@ -378,11 +392,17 @@ func (cb ViewCallBytes) decode(raw []byte) ([]interface{}, error) {
 		}
 		args = append(args, abi.Argument{Name: fmt.Sprintf("ret%d", index), Type: retType})
 	}
+
+	values, _ := args.UnpackValues(raw)
+	aa, _ := json.Marshal(values)
+	fmt.Println("array:", string(aa))
+
 	decoded := make(map[string]interface{})
 	err := args.UnpackIntoMap(decoded, raw)
 	if err != nil {
 		return nil, err
 	}
+
 	returns := make([]interface{}, len(cb.outputTy))
 	for index := range cb.outputTy {
 		key := fmt.Sprintf("ret%d", index)

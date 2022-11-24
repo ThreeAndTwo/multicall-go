@@ -13,7 +13,7 @@ import (
 type Multicall interface {
 	CallRaw(calls ViewCalls, block *big.Int) (*Result, error)
 	Call(calls ViewCalls, block *big.Int) (*Result, error)
-	CallBytes(callsBytes ViewCallsBytes, block *big.Int) (*Result, error)
+	CallBytes(callsBytes ViewCallsBytes, block *big.Int) (*BytesResult, error)
 	Contract() *common.Address
 }
 
@@ -44,9 +44,20 @@ type CallResult struct {
 	Decoded []interface{}
 }
 
+type CallBytesResult struct {
+	Success bool
+	Raw     []byte
+	Decoded map[string]interface{}
+}
+
 type Result struct {
 	BlockNumber uint64
 	Calls       map[string]CallResult
+}
+
+type BytesResult struct {
+	BlockNumber uint64
+	Calls       map[string]CallBytesResult
 }
 
 const AggregateMethod = "0x17352e13"
@@ -67,7 +78,7 @@ func (mc multicall) Call(calls ViewCalls, block *big.Int) (*Result, error) {
 	return calls.decode(resultRaw)
 }
 
-func (mc multicall) CallBytes(callsBytes ViewCallsBytes, block *big.Int) (*Result, error) {
+func (mc multicall) CallBytes(callsBytes ViewCallsBytes, block *big.Int) (*BytesResult, error) {
 	payloadArgs, err := callsBytes.callData()
 	if err != nil {
 		return nil, err
