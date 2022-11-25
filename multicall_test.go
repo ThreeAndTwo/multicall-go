@@ -68,7 +68,7 @@ func TestExampleViwCallBytes(t *testing.T) {
 
 	println("resJson:", string(resJson))
 	println("aaaaa", gjson.Get(string(resJson), "Calls.balance.Decoded.0.1").String())
-	sss := res.Calls["balance"].Decoded["0.1"]
+	sss := res.Calls["balance"].Decoded
 
 	fmt.Println("ssss", sss)
 	fmt.Println(res)
@@ -94,10 +94,13 @@ func TestExampleViewCallBytes(t *testing.T) {
 		panic(err)
 	}
 
-	resJson, _ := json.Marshal(res)
+	resJson, _ := json.Marshal(res.Calls["balance"].Decoded)
 
-	println(string(resJson))
-	//println("aaaaa", gjson.Get(string(resJson), "Calls.balance.Decoded.1").String())
+	//println(string(resJson))
+
+	//res.Calls["balance"]
+	println("aaaaa", gjson.Get(string(resJson), "1.3").String())
+	println("bbb", gjson.Get(string(resJson), "0.0.decimals").String())
 
 	//fmt.Println(res)
 	//fmt.Println(err)

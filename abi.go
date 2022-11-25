@@ -1,13 +1,14 @@
 package multicall2
 
 import (
-	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"math/big"
 	"reflect"
 	"strconv"
 	"strings"
 )
+
+const symbol = "."
 
 type ParseABI struct {
 	_abi   *abi.ABI
@@ -51,21 +52,36 @@ func recursionOutput(originIndex string, val interface{}, dataMap map[string]int
 	num := vv.NumField()
 
 	for i := 0; i < num; i++ {
-		mapKey := originIndex + "." + strconv.Itoa(i)
+		mapKey := originIndex + symbol + strconv.Itoa(i)
 		switch vv.Field(i).Type().Kind() {
 		case reflect.String:
 			dataMap[mapKey] = vv.Field(i).Interface().(string)
-			//fmt.Println(vv.Field(i).Interface().(string))
 		case reflect.Ptr:
-			dataMap[mapKey] = vv.Field(i).Interface().(*big.Int).String()
-			//fmt.Println(vv.Field(i).Interface().(*big.Int))
+			dataMap[mapKey] = vv.Field(i).Interface().(*big.Int)
 		case reflect.Bool:
 			dataMap[mapKey] = vv.Field(i).Interface().(bool)
-			//fmt.Println(vv.Field(i).Interface().(bool))
+		case reflect.Uint:
+			dataMap[mapKey] = vv.Field(i).Interface().(uint)
 		case reflect.Uint8:
-			dataMap[mapKey] = fmt.Sprintf("%d", vv.Field(i).Interface().(uint8))
+			dataMap[mapKey] = vv.Field(i).Interface().(uint8)
+		case reflect.Uint16:
+			dataMap[mapKey] = vv.Field(i).Interface().(uint16)
+		case reflect.Uint32:
+			dataMap[mapKey] = vv.Field(i).Interface().(uint32)
+		case reflect.Uint64:
+			dataMap[mapKey] = vv.Field(i).Interface().(uint64)
+		case reflect.Int:
+			dataMap[mapKey] = vv.Field(i).Interface().(int)
+		case reflect.Int8:
+			dataMap[mapKey] = vv.Field(i).Interface().(int8)
+		case reflect.Int16:
+			dataMap[mapKey] = vv.Field(i).Interface().(int16)
+		case reflect.Int32:
+			dataMap[mapKey] = vv.Field(i).Interface().(int32)
+		case reflect.Int64:
+			dataMap[mapKey] = vv.Field(i).Interface().(int64)
 		case reflect.Struct:
-			recursionOutput(originIndex+"."+strconv.Itoa(i), vv.Field(i).Interface(), dataMap)
+			recursionOutput(originIndex+symbol+strconv.Itoa(i), vv.Field(i).Interface(), dataMap)
 		}
 	}
 }
